@@ -116,6 +116,28 @@ describe "the individual event page" do
       page.should have_css('.both', count: 2)
       page.should have_css('.none', count: 1)
     end
+
+    it "lets the user check in volunteers" do
+      user1 = create(:user)      
+      user2 = create(:user)
+
+      session1 = @event.event_sessions.first
+      session2 = create(:event_session, event: @event)
+
+      rsvp1 = create(:rsvp, user: user1, event: @event)
+      rsvp2 = create(:rsvp, user: user2, event: @event)
+
+      create(:rsvp_session, rsvp: rsvp1, event_session: session1)
+      create(:rsvp_session, rsvp: rsvp2, event_session: session1)
+
+      visit event_path(@event)
+      page.should have_content("Check in Session 1")
+      page.should have_content("Check in Session 2")
+
+      click_link("Check in Session 1")
+      page.should have_content(user1.first_name)
+    end
+
   end
 
   context "user is logged in and is an admin" do
